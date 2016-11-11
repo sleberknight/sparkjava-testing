@@ -1,6 +1,6 @@
 # sparkjava-testing
 
-A small testing library with a JUnit Rule for spinning up a Spark server for functional testing of HTTP clients.
+A small testing library with a JUnit Rule for spinning up a [Spark](http://sparkjava.com/) server for functional testing of HTTP clients.
 
 ## Example usage
 
