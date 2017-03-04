@@ -10,9 +10,9 @@ Generally you will want to use a JUnit `@ClassRule` so the server is spun up _on
 
 ```java
 @ClassRule
-public static final SparkServerRule SPARK_SERVER = new SparkServerRule(() -> {
-    get("/ping", (request, response) -> "pong");
-    get("/health", (request, response) -> "healthy");
+public static final SparkServerRule SPARK_SERVER = new SparkServerRule(http -> {
+    http.get("/ping", (request, response) -> "pong");
+    http.get("/health", (request, response) -> "healthy");
 });
 ```
 
@@ -32,31 +32,29 @@ public void testSparkServerRule_PingRequest() {
 
 Since Spark runs on port 4567 by default that's the port our client test uses. Also, the `client` is closed in a test tear down method.
 
-The `SparkServerRule` class has two other constructors, one that accepts a port, and another that accepts a `SparkInitializer`. To start your test server on a different port, you can do this:
+The `SparkServerRule` class has only one constructor that accepts a `ServiceInitializer`, which is a `@FunctionalInterface` so you can pass a lambda expression. The `ServiceInitializer#init` method takes one argument, an instance of Spark's `Service` class, on which you configure the server, add routes, filters, etc.  For example, to start your test server on a different port, you can do this:
 
 ```java
 @ClassRule
-public static final SparkServerRule SPARK_SERVER = new SparkServerRule(9876, () -> {
-    get("/ping", (request, response) -> "pong");
-    get("/health", (request, response) -> "healthy");
+public static final SparkServerRule SPARK_SERVER = new SparkServerRule(http -> {
+    http.port(9876);
+    http.get("/ping", (request, response) -> "pong");
+    http.get("/health", (request, response) -> "healthy");
 });
 ```
 
-And if you want to change not only the port, but also the IP address and make the server secure, you use the `SparkInitializer` (which is a `@FunctionalInterface` so you can use a lambda):
+And if you want to change not only the port, but also the IP address and make the server secure, you can do it like this:
 
 ```java
 @ClassRule
 public static final SparkServerRule SPARK_SERVER = new SparkServerRule(
-        () -> {
-            Spark.ipAddress("127.0.0.1");
-            Spark.port(9876);
+        https -> {
+            https.ipAddress("127.0.0.1");
+            https.port(9876);
             URL resource = Resources.getResource("sample-keystore.jks");
-            String file = resource.getFile();
-            Spark.secure(file, "password", null, null);
-        },
-        () -> {
-            get("/ping", (request, response) -> "pong");
-            get("/health", (request, response) -> "healthy");
+            https.secure(resource.getFile(), "password", null, null);
+            https.get("/ping", (request, response) -> "pong");
+            https.get("/health", (request, response) -> "healthy");
         });
 ```
 
