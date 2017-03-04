@@ -11,16 +11,16 @@ import java.net.URI;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static spark.Spark.get;
 
 public class SparkServerRuleWithPortTest {
 
     private Client client;
 
     @ClassRule
-    public static final SparkServerRule SPARK_SERVER = new SparkServerRule(6543, () -> {
-        get("/ping", (request, response) -> "pong");
-        get("/health", (request, response) -> "healthy");
+    public static final SparkServerRule SPARK_SERVER = new SparkServerRule(http -> {
+        http.port(6543);
+        http.get("/ping", (request, response) -> "pong");
+        http.get("/health", (request, response) -> "healthy");
     });
 
     @After

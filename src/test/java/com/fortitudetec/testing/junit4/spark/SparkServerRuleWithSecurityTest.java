@@ -5,7 +5,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
-import spark.Spark;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -19,26 +18,21 @@ import java.net.URL;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static spark.Spark.get;
 
-public class SparkServerRuleWithInitializerTest {
+public class SparkServerRuleWithSecurityTest {
 
     private Client client;
     private HostnameVerifier defaultHostnameVerifier;
 
     @ClassRule
-    public static final SparkServerRule SPARK_SERVER = new SparkServerRule(
-            () -> {
-                Spark.ipAddress("127.0.0.1");
-                Spark.port(9876);
-                URL resource = Resources.getResource("sample-keystore.jks");
-                String file = resource.getFile();
-                Spark.secure(file, "password", null, null);
-            },
-            () -> {
-                get("/ping", (request, response) -> "pong");
-                get("/health", (request, response) -> "healthy");
-            });
+    public static final SparkServerRule SPARK_SERVER = new SparkServerRule(https -> {
+        https.ipAddress("127.0.0.1");
+        https.port(9876);
+        URL resource = Resources.getResource("sample-keystore.jks");
+        https.secure(resource.getFile(), "password", null, null);
+        https.get("/ping", (request, response) -> "pong");
+        https.get("/health", (request, response) -> "healthy");
+    });
 
     @Before
     public void setUp() {
