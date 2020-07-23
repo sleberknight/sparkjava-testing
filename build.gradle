@@ -2,6 +2,7 @@ group 'com.fortitudetec'
 version '1.0.0-SNAPSHOT'
 
 apply plugin: 'java'
+apply plugin : 'eclipse'
 
 sourceCompatibility = 1.8
 
@@ -10,10 +11,17 @@ repositories {
     mavenCentral()
 }
 
+test {
+	useJUnitPlatform {
+		includeEngines("junit-jupiter", "junit-vintage")
+	}
+}
+
 dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.21'
     compile group: 'com.sparkjava', name: 'spark-core', version: '2.5.5'
-    compile group: 'junit', name: 'junit', version: '4.12'
+    compile group: 'org.junit.jupiter', name: 'junit-jupiter', version: '5.6.1'
+    compile group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.6.1'
 
     testCompile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.1'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.7.13'

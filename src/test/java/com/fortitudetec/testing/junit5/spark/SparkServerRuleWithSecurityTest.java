@@ -1,4 +1,4 @@
-package com.fortitudetec.testing.junit4.spark;
+package com.fortitudetec.testing.junit5.spark;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -14,31 +14,36 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import com.fortitudetec.testing.junit5.spark.JavaSparkRunnerExtension.SparkStarter;
 import com.google.common.io.Resources;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Test;
-
-public class SparkServerRuleWithSecurityTest {
+@ExtendWith(JavaSparkRunnerExtension.class)
+class SparkServerRuleWithSecurityTest {
 
     private Client client;
     private HostnameVerifier defaultHostnameVerifier;
 
-    @ClassRule
-    public static final SparkServerRule SPARK_SERVER = new SparkServerRule(https -> {
-        https.ipAddress("127.0.0.1");
-        https.port(9876);
-        URL resource = Resources.getResource("sample-keystore.jks");
-        https.secure(resource.getFile(), "password", null, null);
-        https.get("/ping", (request, response) -> "pong");
-        https.get("/health", (request, response) -> "healthy");
-    });
-
-    @Before
-    public void setUp() {
+    @BeforeAll
+    static void setUp(SparkStarter s) {
+		s.runSpark(https -> {
+			https.ipAddress("127.0.0.1");
+			https.port(9876);
+			URL resource = Resources.getResource("sample-keystore.jks");
+			https.secure(resource.getFile(), "password", null, null);
+			https.get("/ping", (request, response) -> "pong");
+			https.get("/health", (request, response) -> "healthy");
+		});
+	}
+    
+    @BeforeEach
+    void setUp() {
         defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
 
         // Create and install all-trusting host name verifier (so both localhost and 127.0.0.1 will work)
@@ -46,16 +51,16 @@ public class SparkServerRuleWithSecurityTest {
         HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
     }
 
-    @After
-    public void tearDown() {
+    @AfterEach
+    void tearDown() {
         Optional.ofNullable(client).ifPresent(Client::close);
 
         HttpsURLConnection.setDefaultHostnameVerifier(defaultHostnameVerifier);
     }
 
     @Test
-    @Ignore
-    public void testSparkServerRule_PingRequest() {
+    @Disabled
+    void testSparkServerRule_PingRequest() {
         client = ClientBuilder.newBuilder()
                 .sslContext(createSSLContext())
                 .build();
@@ -68,8 +73,8 @@ public class SparkServerRuleWithSecurityTest {
     }
 
     @Test
-    @Ignore
-    public void testSparkServerRule_HealthRequest() {
+    @Disabled
+    void testSparkServerRule_HealthRequest() {
         client = ClientBuilder.newBuilder()
                 .sslContext(createSSLContext())
                 .build();
