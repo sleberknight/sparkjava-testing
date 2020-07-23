@@ -2,9 +2,12 @@ package com.fortitudetec.testing.junit4.spark;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.Optional;
+import com.google.common.io.Resources;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -13,14 +16,9 @@ import javax.net.ssl.TrustManager;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
-
-import com.google.common.io.Resources;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Ignore;
-import org.junit.Test;
+import java.net.URI;
+import java.net.URL;
+import java.util.Optional;
 
 public class SparkServerRuleWithSecurityTest {
 

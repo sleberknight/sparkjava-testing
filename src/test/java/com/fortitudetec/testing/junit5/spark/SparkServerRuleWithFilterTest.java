@@ -3,19 +3,17 @@ package com.fortitudetec.testing.junit5.spark;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.URI;
-import java.util.Optional;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Response;
-
+import com.fortitudetec.testing.junit5.spark.JavaSparkRunnerExtension.SparkStarter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.fortitudetec.testing.junit5.spark.JavaSparkRunnerExtension.SparkStarter;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Response;
+import java.net.URI;
+import java.util.Optional;
 
 @ExtendWith(JavaSparkRunnerExtension.class)
 class SparkServerRuleWithFilterTest {
@@ -24,18 +22,18 @@ class SparkServerRuleWithFilterTest {
 
     private static boolean authenticated;
 
-	@BeforeAll
-	static void setUp(SparkStarter s) {
-		s.runSpark(http -> {
-			http.port(56789);
-			http.before((request, response) -> {
-				if (!authenticated) {
-					http.halt(401, "Go away!");
-				}
-			});
-			http.get("/secret", (request, response) -> "Don't forget to drink your Ovaltine!");
-		});
-	}
+    @BeforeAll
+    static void setUp(SparkStarter s) {
+        s.runSpark(http -> {
+            http.port(56789);
+            http.before((request, response) -> {
+                if (!authenticated) {
+                    http.halt(401, "Go away!");
+                }
+            });
+            http.get("/secret", (request, response) -> "Don't forget to drink your Ovaltine!");
+        });
+    }
 
     @AfterEach
     void tearDown() {

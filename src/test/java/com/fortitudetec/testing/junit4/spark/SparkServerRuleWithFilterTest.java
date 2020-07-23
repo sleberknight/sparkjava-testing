@@ -1,5 +1,7 @@
 package com.fortitudetec.testing.junit4.spark;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.After;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -9,8 +11,6 @@ import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class SparkServerRuleWithFilterTest {
 

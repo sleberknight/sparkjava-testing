@@ -2,32 +2,30 @@ package com.fortitudetec.testing.junit5.spark;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.URI;
-import java.util.Optional;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.core.Response;
-
+import com.fortitudetec.testing.junit5.spark.JavaSparkRunnerExtension.SparkStarter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import com.fortitudetec.testing.junit5.spark.JavaSparkRunnerExtension.SparkStarter;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.core.Response;
+import java.net.URI;
+import java.util.Optional;
 
 @ExtendWith(JavaSparkRunnerExtension.class)
 class SparkServerRuleTest {
 
     private Client client = ClientBuilder.newClient();
 
-	@BeforeEach
-	void setUp(SparkStarter s) {
-		s.runSpark(http -> {
-			http.get("/ping", (request, response) -> "pong");
-			http.get("/health", (request, response) -> "healthy");
-		});
-	}
+    @BeforeEach
+    void setUp(SparkStarter s) {
+        s.runSpark(http -> {
+            http.get("/ping", (request, response) -> "pong");
+            http.get("/health", (request, response) -> "healthy");
+        });
+    }
 
     @AfterEach
     void tearDown() {

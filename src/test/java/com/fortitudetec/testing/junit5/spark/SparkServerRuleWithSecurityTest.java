@@ -2,9 +2,14 @@ package com.fortitudetec.testing.junit5.spark;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.net.URI;
-import java.net.URL;
-import java.util.Optional;
+import com.fortitudetec.testing.junit5.spark.JavaSparkRunnerExtension.SparkStarter;
+import com.google.common.io.Resources;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -13,16 +18,9 @@ import javax.net.ssl.TrustManager;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.core.Response;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import com.fortitudetec.testing.junit5.spark.JavaSparkRunnerExtension.SparkStarter;
-import com.google.common.io.Resources;
+import java.net.URI;
+import java.net.URL;
+import java.util.Optional;
 
 @ExtendWith(JavaSparkRunnerExtension.class)
 class SparkServerRuleWithSecurityTest {
@@ -32,16 +30,16 @@ class SparkServerRuleWithSecurityTest {
 
     @BeforeAll
     static void setUp(SparkStarter s) {
-		s.runSpark(https -> {
-			https.ipAddress("127.0.0.1");
-			https.port(9876);
-			URL resource = Resources.getResource("sample-keystore.jks");
-			https.secure(resource.getFile(), "password", null, null);
-			https.get("/ping", (request, response) -> "pong");
-			https.get("/health", (request, response) -> "healthy");
-		});
-	}
-    
+        s.runSpark(https -> {
+            https.ipAddress("127.0.0.1");
+            https.port(9876);
+            URL resource = Resources.getResource("sample-keystore.jks");
+            https.secure(resource.getFile(), "password", null, null);
+            https.get("/ping", (request, response) -> "pong");
+            https.get("/health", (request, response) -> "healthy");
+        });
+    }
+
     @BeforeEach
     void setUp() {
         defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
