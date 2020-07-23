@@ -1,24 +1,30 @@
 # sparkjava-testing
 
-A small testing library with a JUnit Rule for spinning up a [Spark](http://sparkjava.com/) server for functional testing of HTTP clients.
+A small testing library for spinning up a [Spark](http://sparkjava.com/) server for functional testing of HTTP clients.
 
 ## Example usage
 
-See the actual tests for example usage. But if you don't want to do that, here's a short example.
+See the actual tests for example usage. But if you don't want to do that, here's a short example that uses
+the JUnit Jupiter extension.
 
-You can let inject you an instance of a SparkRunner. Then your tests run, making HTTP requests to the test server, and finally the server is shut down after tests have run. The injection can be done in several places e.g. in methods annotated with @BeforeEach @BeforeAll or even @Test
+First, annotate your test with `@ExtendWith(JavaSparkRunnerExtension.class)`. Then, create a `@BeforeAll` method
+that accepts a `SparkStarter`, which allows you to define the various HTTP routes. Then your tests run, making HTTP 
+requests to the test server, and finally the server is shut down after tests have run. The injection can be done in 
+several places e.g. in methods annotated with @BeforeEach @BeforeAll or even @Test.
 
 ```java
 @BeforeAll
-static void setUp(SparkStarter s) {
-	s.runSpark(http -> {
-		http.get("/ping", (request, response) -> "pong");
-		http.get("/health", (request, response) -> "healthy");
-	});
+static void beforeAll(SparkStarter s) {
+    s.runSpark(http -> {
+        http.get("/ping", (request, response) -> "pong");
+        http.get("/health", (request, response) -> "healthy");
+    });
 }
 ```
 
-In the above rule, there are two _routes_, `/ping` and `/health`, specified in the lambda which simply return 200 responses containing strings. Here's an example test using a Jersey client (I'm using [AssertJ](http://joel-costigliola.github.io/assertj/) assertions in this test):
+In the above example, there are two _routes_, `/ping` and `/health`, specified in the lambda which simply return
+200 responses containing strings. Here's an example test using a Jersey client (I'm using [AssertJ](http://joel-costigliola.github.io/assertj/) 
+assertions in this test):
 
 ```java
 @Test
@@ -32,18 +38,19 @@ public void testSparkServerRule_PingRequest() {
 }
 ```
 
-Since Spark runs on port 4567 by default that's the port our client test uses. Also, the `client` is closed in a test tear down method.
+Since Spark runs on port 4567 by default that's the port our client test uses. Also, the `client` is closed in a test
+tear down method.
 
-The `SparkServerRule` class has only one constructor that accepts a `ServiceInitializer`, which is a `@FunctionalInterface` so you can pass a lambda expression. The `ServiceInitializer#init` method takes one argument, an instance of Spark's `Service` class, on which you configure the server, add routes, filters, etc.  For example, to start your test server on a different port, you can do this:
+If you want to run the test on a different port you could do it as follows:
 
 ```java
 @BeforeAll
 static void setUp(SparkStarter s) {
-	s.runSpark(http -> {
-    		http.port(9876);
-		http.get("/ping", (request, response) -> "pong");
-		http.get("/health", (request, response) -> "healthy");
-	});
+    s.runSpark(http -> {
+        http.port(9876);
+        http.get("/ping", (request, response) -> "pong");
+        http.get("/health", (request, response) -> "healthy");
+    });
 }
 ```
 
@@ -52,13 +59,13 @@ And if you want to change not only the port, but also the IP address and make th
 ```java
 @BeforeAll
 static void setUp(SparkStarter s) {
-	s.runSpark(https -> {
-            	https.ipAddress("127.0.0.1");
-    		https.port(9876);
-		URL resource = Resources.getResource("sample-keystore.jks");
-		https.get("/ping", (request, response) -> "pong");
-		https.get("/health", (request, response) -> "healthy");
-	});
+    s.runSpark(https -> {
+        https.ipAddress("127.0.0.1");
+        https.port(9876);
+        URL resource = Resources.getResource("sample-keystore.jks");
+        https.get("/ping", (request, response) -> "pong");
+        https.get("/health", (request, response) -> "healthy");
+    });
 }
 ```
 
