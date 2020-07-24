@@ -30,6 +30,7 @@ public class SparkServerRuleWithSecurityTest {
     public static final SparkServerRule SPARK_SERVER = new SparkServerRule(https -> {
         https.ipAddress("127.0.0.1");
         https.port(9876);
+        //noinspection UnstableApiUsage
         URL resource = Resources.getResource("sample-keystore.jks");
         https.secure(resource.getFile(), "password", null, null);
         https.get("/ping", (request, response) -> "pong");
