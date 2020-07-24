@@ -3,6 +3,7 @@ package com.fortitudetec.testing.junit4.spark;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -23,6 +24,11 @@ public class SparkServerRuleWithPortTest {
         http.get("/health", (request, response) -> "healthy");
     });
 
+    @Before
+    public void setUp() {
+        client = ClientBuilder.newClient();
+    }
+
     @After
     public void tearDown() {
         Optional.ofNullable(client).ifPresent(Client::close);
@@ -30,7 +36,6 @@ public class SparkServerRuleWithPortTest {
 
     @Test
     public void testSparkServerRule_PingRequest() {
-        client = ClientBuilder.newBuilder().build();
         Response response = client.target(URI.create("http://localhost:6543/ping"))
                 .request()
                 .get();
@@ -40,7 +45,6 @@ public class SparkServerRuleWithPortTest {
 
     @Test
     public void testSparkServerRule_HealthRequest() {
-        client = ClientBuilder.newBuilder().build();
         Response response = client.target(URI.create("http://localhost:6543/health"))
                 .request()
                 .get();

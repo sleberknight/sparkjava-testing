@@ -3,6 +3,7 @@ package com.fortitudetec.testing.junit4.spark;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.After;
+import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 
@@ -18,7 +19,6 @@ public class SparkServerRuleWithFilterTest {
 
     private static boolean authenticated;
 
-    @SuppressWarnings("ThrowableNotThrown") // b/c halt throws *and returns* a HaltException
     @ClassRule
     public static final SparkServerRule SPARK_SERVER = new SparkServerRule(http -> {
         http.port(56789);
@@ -30,6 +30,11 @@ public class SparkServerRuleWithFilterTest {
         http.get("/secret", (request, response) -> "Don't forget to drink your Ovaltine!");
     });
 
+    @Before
+    public void setUp() {
+        client = ClientBuilder.newClient();
+    }
+
     @After
     public void tearDown() {
         Optional.ofNullable(client).ifPresent(Client::close);
@@ -39,7 +44,6 @@ public class SparkServerRuleWithFilterTest {
     public void testSparkServerRule_PingRequest_WhenAuthenticated() {
         authenticated = true;
 
-        client = ClientBuilder.newClient();
         Response response = client.target(URI.create("http://localhost:56789/secret"))
                 .request()
                 .get();
@@ -51,7 +55,6 @@ public class SparkServerRuleWithFilterTest {
     public void testSparkServerRule_PingRequest_WhenNotAuthenticated() {
         authenticated = false;
 
-        client = ClientBuilder.newClient();
         Response response = client.target(URI.create("http://localhost:56789/secret"))
                 .request()
                 .get();

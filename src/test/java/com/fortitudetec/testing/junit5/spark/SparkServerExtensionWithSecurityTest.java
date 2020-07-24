@@ -3,6 +3,7 @@ package com.fortitudetec.testing.junit5.spark;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fortitudetec.testing.junit5.spark.JavaSparkRunnerExtension.SparkStarter;
+import com.fortitudetec.testing.util.NoOpX509TrustManager;
 import com.google.common.io.Resources;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -23,7 +24,7 @@ import java.net.URL;
 import java.util.Optional;
 
 @ExtendWith(JavaSparkRunnerExtension.class)
-class SparkServerRuleWithSecurityTest {
+class SparkServerExtensionWithSecurityTest {
 
     private Client client;
     private HostnameVerifier defaultHostnameVerifier;
@@ -47,6 +48,8 @@ class SparkServerRuleWithSecurityTest {
         // Create and install all-trusting host name verifier (so both localhost and 127.0.0.1 will work)
         HostnameVerifier allHostsValid = (hostname, session) -> true;
         HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+
+        client = ClientBuilder.newClient();
     }
 
     @AfterEach
@@ -58,7 +61,7 @@ class SparkServerRuleWithSecurityTest {
 
     @Test
     @Disabled
-    void testSparkServerRule_PingRequest() {
+    void testSparkServerExtension_PingRequest() {
         client = ClientBuilder.newBuilder()
                 .sslContext(createSSLContext())
                 .build();
@@ -72,7 +75,7 @@ class SparkServerRuleWithSecurityTest {
 
     @Test
     @Disabled
-    void testSparkServerRule_HealthRequest() {
+    void testSparkServerExtension_HealthRequest() {
         client = ClientBuilder.newBuilder()
                 .sslContext(createSSLContext())
                 .build();

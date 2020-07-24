@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fortitudetec.testing.junit5.spark.JavaSparkRunnerExtension.SparkStarter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -16,9 +17,9 @@ import java.net.URI;
 import java.util.Optional;
 
 @ExtendWith(JavaSparkRunnerExtension.class)
-class SparkServerRuleWithFilterTest {
+class SparkServerExtensionWithFilterTest {
 
-    private Client client = ClientBuilder.newClient();
+    private Client client;
 
     private static boolean authenticated;
 
@@ -35,13 +36,18 @@ class SparkServerRuleWithFilterTest {
         });
     }
 
+    @BeforeEach
+    void setUp() {
+        client = ClientBuilder.newClient();
+    }
+
     @AfterEach
     void tearDown() {
         Optional.ofNullable(client).ifPresent(Client::close);
     }
 
     @Test
-    void testSparkServerRule_PingRequest_WhenAuthenticated() {
+    void testSparkServerExtension_PingRequest_WhenAuthenticated() {
         authenticated = true;
         Response response = client.target(URI.create("http://localhost:56789/secret"))
                 .request()
@@ -51,7 +57,7 @@ class SparkServerRuleWithFilterTest {
     }
 
     @Test
-    void testSparkServerRule_PingRequest_WhenNotAuthenticated() {
+    void testSparkServerExtension_PingRequest_WhenNotAuthenticated() {
         authenticated = false;
         Response response = client.target(URI.create("http://localhost:56789/secret"))
                 .request()

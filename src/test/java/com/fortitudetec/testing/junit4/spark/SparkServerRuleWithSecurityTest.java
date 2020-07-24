@@ -2,6 +2,7 @@ package com.fortitudetec.testing.junit4.spark;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fortitudetec.testing.util.NoOpX509TrustManager;
 import com.google.common.io.Resources;
 import org.junit.After;
 import org.junit.Before;

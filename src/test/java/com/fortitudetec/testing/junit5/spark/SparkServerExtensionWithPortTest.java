@@ -1,9 +1,11 @@
 package com.fortitudetec.testing.junit5.spark;
 
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fortitudetec.testing.junit5.spark.JavaSparkRunnerExtension.SparkStarter;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,16 +17,22 @@ import java.net.URI;
 import java.util.Optional;
 
 @ExtendWith(JavaSparkRunnerExtension.class)
-class SparkServerRuleTest {
+class SparkServerExtensionWithPortTest {
 
-    private Client client = ClientBuilder.newClient();
+    private Client client;
 
-    @BeforeEach
-    void setUp(SparkStarter s) {
+    @BeforeAll
+    static void setUp(SparkStarter s) {
         s.runSpark(http -> {
+            http.port(6543);
             http.get("/ping", (request, response) -> "pong");
             http.get("/health", (request, response) -> "healthy");
         });
+    }
+
+    @BeforeEach
+    void setUp() {
+        client = ClientBuilder.newClient();
     }
 
     @AfterEach
@@ -33,8 +41,8 @@ class SparkServerRuleTest {
     }
 
     @Test
-    void testSparkServerRule_PingRequest() {
-        Response response = client.target(URI.create("http://localhost:4567/ping"))
+    void testSparkServerExtension_PingRequest() {
+        Response response = client.target(URI.create("http://localhost:6543/ping"))
                 .request()
                 .get();
         assertThat(response.getStatus()).isEqualTo(200);
@@ -42,8 +50,8 @@ class SparkServerRuleTest {
     }
 
     @Test
-    void testSparkServerRule_HealthRequest() {
-        Response response = client.target(URI.create("http://localhost:4567/health"))
+    void testSparkServerExtension_HealthRequest() {
+        Response response = client.target(URI.create("http://localhost:6543/health"))
                 .request()
                 .get();
         assertThat(response.getStatus()).isEqualTo(200);

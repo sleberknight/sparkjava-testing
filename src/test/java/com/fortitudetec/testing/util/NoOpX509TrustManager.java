@@ -1,9 +1,9 @@
-package com.fortitudetec.testing.junit5.spark;
+package com.fortitudetec.testing.util;
 
 import javax.net.ssl.X509TrustManager;
 import java.security.cert.X509Certificate;
 
-class NoOpX509TrustManager implements X509TrustManager {
+public class NoOpX509TrustManager implements X509TrustManager {
     public java.security.cert.X509Certificate[] getAcceptedIssuers() {
         return null;
     }
